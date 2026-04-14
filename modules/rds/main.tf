@@ -1,24 +1,47 @@
-resource "aws_db_subnet_group" "db_subnet" {
-  name       = "timesheet-db-subnet-group-yatish-v1997"
-  subnet_ids = var.private_subnet_ids
+# -------------------------------
+# ENVIRONMENT
+# -------------------------------
+resource "aws_elastic_beanstalk_environment" "env" {
+  name                = "timesheet-env-v1997"
+  application         = aws_elastic_beanstalk_application.app.name
+  solution_stack_name = "64bit Amazon Linux 2023 v4.11.0 running Python 3.11"
 
-  tags = {
-    Name = "timesheet-db-subnet-group"
+  # ... (keep all your existing settings) ...
+
+  # 🔴 ADD THESE RDS CONNECTION SETTINGS 🔴
+  
+  # RDS ENDPOINT
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "RDS_HOSTNAME"
+    value     = var.rds_endpoint
   }
-}
 
-resource "aws_db_instance" "db" {
-  allocated_storage    = 20
-  engine               = "mysql"
-  engine_version       = "8.0"
-  instance_class       = "db.t3.micro"
-  db_name              = "timesheetdb"
-  username             = "admin8"
-  password             = "Admin123478"
-  skip_final_snapshot  = true
+  # RDS DATABASE NAME
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "RDS_DB_NAME"
+    value     = var.rds_db_name
+  }
 
-  db_subnet_group_name   = aws_db_subnet_group.db_subnet.name
-  vpc_security_group_ids = [var.security_group_id]
+  # RDS USERNAME
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "RDS_USERNAME"
+    value     = var.rds_username
+  }
 
-  publicly_accessible = false
+  # RDS PASSWORD
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "RDS_PASSWORD"
+    value     = var.rds_password
+  }
+
+  # RDS PORT
+  setting {
+    namespace = "aws:elasticbeanstalk:application:environment"
+    name      = "RDS_PORT"
+    value     = var.rds_port
+  }
 }
