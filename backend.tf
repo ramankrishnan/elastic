@@ -1,6 +1,6 @@
 terraform {
   backend "s3" {
-    bucket = "timesheet-terraform-state-yatish-1997"
+    bucket = "raman-terraform-state-123"
     key    = "terraform/state.tfstate"
     region = "ap-south-1"
   }

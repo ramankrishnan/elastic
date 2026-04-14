@@ -1,47 +1,36 @@
 # -------------------------------
-# ENVIRONMENT
+# RDS SUBNET GROUP
 # -------------------------------
-resource "aws_elastic_beanstalk_environment" "env" {
-  name                = "timesheet-env-v1997"
-  application         = aws_elastic_beanstalk_application.app.name
-  solution_stack_name = "64bit Amazon Linux 2023 v4.11.0 running Python 3.11"
+resource "aws_db_subnet_group" "rds_subnet_group" {
+  name       = "timesheet-rds-subnet-group-v1997"
+  subnet_ids = var.private_subnet_ids
 
-  # ... (keep all your existing settings) ...
-
-  # 🔴 ADD THESE RDS CONNECTION SETTINGS 🔴
-  
-  # RDS ENDPOINT
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_HOSTNAME"
-    value     = var.rds_endpoint
+  tags = {
+    Name = "timesheet-rds-subnet-group"
   }
+}
 
-  # RDS DATABASE NAME
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_DB_NAME"
-    value     = var.rds_db_name
-  }
+# -------------------------------
+# RDS INSTANCE
+# -------------------------------
+resource "aws_db_instance" "db" {
+  identifier              = "timesheet-db-v1997"
+  engine                  = "mysql"
+  engine_version          = "8.0"
+  instance_class          = "db.t3.micro"
+  allocated_storage       = 20
+  storage_type            = "gp2"
+  db_name                 = var.db_name
+  username                = var.db_username
+  password                = var.db_password
+  db_subnet_group_name    = aws_db_subnet_group.rds_subnet_group.name
+  vpc_security_group_ids  = [var.security_group_id]
+  skip_final_snapshot     = true
+  publicly_accessible     = false
+  backup_retention_period = 0
+  multi_az                = false
 
-  # RDS USERNAME
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_USERNAME"
-    value     = var.rds_username
-  }
-
-  # RDS PASSWORD
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_PASSWORD"
-    value     = var.rds_password
-  }
-
-  # RDS PORT
-  setting {
-    namespace = "aws:elasticbeanstalk:application:environment"
-    name      = "RDS_PORT"
-    value     = var.rds_port
+  tags = {
+    Name = "timesheet-rds-instance"
   }
 }
