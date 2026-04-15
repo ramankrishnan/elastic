@@ -30,9 +30,7 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ env.AWS_REGION }}
 
-      # Terraform Init
-      - name: Terraform Init
-        run: terraform init
+
 
 
       # Terraform destroy
